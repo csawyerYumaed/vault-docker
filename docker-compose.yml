@@ -1,0 +1,11 @@
+version: '2'
+services:
+  cpvault:
+    image: cpvault:v0.6.0-rebuild
+    restart: unless-stopped
+    network_mode: "host"
+    ports:
+      - "8200:8200"    
+    command: ["server -config=/vault.hcl"]
+    cap_add:
+      - IPC_LOCK

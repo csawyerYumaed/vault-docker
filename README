@@ -1,0 +1,55 @@
+VAULT
+(Hashicorp Vault)
+https://github.com/hashicorp/vault
+
+I wanted a full, ready to use vault image for docker. I couldn't find one that
+ wasn't either huge, or incomplete.  This is my hopefully "complete" one that
+  uses a "scratch" (or very nearly actually) image.
+
+I use centurylink/ca-certs instead of scratch, because it has the CA carts in it.
+Otherwise it is a scratch image.
+
+vault-src == vault source.
+build.sh == (script to checkout vault and build image)
+Dockerfile == (Docker config file to build image)
+docker-compose.yml ==  (a docker compose config to run vault)
+gencert.sh == (a crappy way to generate a self-signed cert) -- DO NOT USE FOR PRODUCTION.
+            GET A REAL CERT DUDE.  for this build name them server.crt and server.key
+supervisor-vault.conf ==  if you don't want to use docker-compose, you can use supervisord to run docker vault
+vault.hcl ==  vault's configuration file.
+
+server.key == your SSL cert private key (you have to provide this)
+server.crt == your SSL cert public key (you have to provide this)
+to build vault image:
+
+(run ./build.sh OR):
+
+	#clone the repo
+	git clone https://github.com/hashicorp/vault vault-src
+	cd vault-src
+
+	#go to latest version (by the time you read this, there may be a new release)
+	git checkout v0.6.0-rebuild
+
+	#put this in your Dockerfile:
+	FROM centurylink/ca-certs
+	EXPOSE 8200
+	COPY bin/vault /
+	COPY vault.hcl /
+	ENTRYPOINT ["/vault"]
+
+build.sh includes a call to ../gencert.py vault (that will generate a certificate for hostname vault.service.consul).
+
+#Run this to build (notice the :v0.6.0 -- change to version you checked out above):
+docker run --rm -v "$(pwd):/src" -v /var/run/docker.sock:/var/run/docker.sock -e OUTPUT=bin/vault centurylink/golang-builder vault:v0.6.0
+
+#run vault:
+docker run --rm --net=host -p 8200:8200 vault:v0.6.0-rebuild server -config=/vault.hcl
+
+# use vault locally:
+alias vault='docker exec -it vault /vault "$@"
+
+# use vault remotely:
+(install vault binary)
+export VAULT_ADDR="https://vault.service.consul:8200"
+vault ......
