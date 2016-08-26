@@ -2,6 +2,8 @@ VAULT
 (Hashicorp Vault)
 https://github.com/hashicorp/vault
 
+NOTE: stuck @ <= v0.6.0-rebuild, until centurylink/builder is upgraded to golang 1.7.
+
 I wanted a full, ready to use vault image for docker. I couldn't find one that
  wasn't either huge, or incomplete.  This is my hopefully "complete" one that
   uses a "scratch" (or very nearly actually) image.
