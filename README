@@ -1,3 +1,5 @@
+UPDATE: Vault (hashicorp) provides docker images now.  Use those, we do.
+
 VAULT
 (Hashicorp Vault)
 https://github.com/hashicorp/vault
